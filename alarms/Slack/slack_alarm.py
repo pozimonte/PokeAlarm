@@ -21,17 +21,15 @@ class Slack_Alarm(Alarm):
 		self.channel = settings.get('channel', "general")
 		self.title = settings.get('title', "A wild <pkmn> has appeared!")
 		self.url = settings.get('url', "<gmaps>")
-		self.body = settings.get('body', "Available until <24h_time> (<time_left>).")
+		self.body = settings.get('body', "Available until <12h_time> (<time_left>).")
 		self.username = settings.get('username', "<pkmn>")
 		self.setup_map(settings.get('map', {}))
-		self.startup_message = settings.get('startup_message', "True")
 		log.info("Slack Alarm intialized.")
-		if parse_boolean(self.startup_message):
-			self.post_message(
-				channel=self.channel,
-				username='PokeAlarm',
-				text='PokeAlarm activated! We will alert this channel about pokemon.'
-			)
+		self.post_message(
+			channel=self.channel,
+			username='PokeAlarm',
+			text='PokeAlarm activated! We will alert this channel about pokemon.'
+		)
 	
 	#Establish connection with Slack
 	def connect(self):
@@ -97,6 +95,8 @@ class Slack_Alarm(Alarm):
 		height = settings.get('height', '125')
 		maptype = settings.get('maptype', 'roadmap')
 		zoom = settings.get('zoom', '15')
+		scale = settings.get('scale', '1')
+		gkey = settings.get('key', 'YOUR_KEY_HERE')
 	
 		center = '<CENTER>'
 		query_center = 'center={}'.format(center)
@@ -104,10 +104,13 @@ class Slack_Alarm(Alarm):
 		query_size = 'size={}x{}'.format(width, height)
 		query_zoom = 'zoom={}'.format(zoom)
 		query_maptype = 'maptype={}'.format(maptype)
+		query_scale = 'scale={}'.format(scale)
+		query_key = 'key={}'.format(gkey)
 		
 		self.map = ('https://maps.googleapis.com/maps/api/staticmap?' +
 					query_center + '&' + query_markers + '&' +
-					query_maptype + '&' + query_size + '&' + query_zoom)
+					query_maptype + '&' + query_size + '&' +
+					query_scale + '&' + query_zoom + '&' + query_key)
 	
 	# Build a query for a static map of the pokemon location
 	def get_map_url(self, lat, lng):
